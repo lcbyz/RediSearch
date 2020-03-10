@@ -6,7 +6,6 @@
 #include <limits.h>
 #include "util/dllist.h"
 #include "stemmer.h"
-#include "rm_assert.h"
 
 typedef uint64_t t_docId;
 typedef uint64_t t_offset;
@@ -355,6 +354,21 @@ typedef struct RSExtensionCtx {
 
 /* An extension initialization function  */
 typedef int (*RSExtensionInitFunc)(RSExtensionCtx *ctx);
+
+#ifdef NDEBUG
+#define RS_LOG_ASSERT(ctx, condition, fmt, ...)    (__ASSERT_VOID_CAST (0))
+#define RS_LOG_ASSERT_FMT(ctx, condition, str)     (__ASSERT_VOID_CAST (0))
+#else
+#define RS_LOG_ASSERT_FMT(condition, fmt, ...)                                      \
+    if (!(condition)) {                                                             \
+        RedisModuleCtx* assertCtx = RedisModule_GetThreadSafeContext(NULL);         \
+        RedisModule_Log(assertCtx, "warning", "File %s, Function %s, Line %d - "    \
+                fmt, __FILE__, __func__, __LINE__, __VA_ARGS__);                    \
+        *((char *)NULL) = 0; /* Crashes server crash report*/                       \
+    } 
+#define RS_LOG_ASSERT(condition, str)  RS_LOG_ASSERT_FMT(condition, str "%s", "")
+#endif  //NDEBUG
+
 #ifdef __cplusplus
 }
 #endif

@@ -6,7 +6,7 @@
 #ifdef NDEBUG
 
 #define RS_LOG_ASSERT(ctx, condition, fmt, ...)    (__ASSERT_VOID_CAST (0))
-#define RS_LOG_ASSERT_STR(ctx, condition, str)     (__ASSERT_VOID_CAST (0))
+#define RS_LOG_ASSERT_FMT(ctx, condition, str)     (__ASSERT_VOID_CAST (0))
 
 #else
 
